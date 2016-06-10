@@ -6,6 +6,7 @@ import (
     "log"
     "log/syslog"
     "flag"
+    "math/rand"
     "os"
     "strings"
     "sync"
@@ -20,6 +21,8 @@ import (
     "github.com/markbates/goth"
     "github.com/markbates/goth/providers/gplus"
 )
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 var (
     userEmails    string
@@ -43,15 +46,30 @@ func init() {
 	}
 
     // Set up flags
-    flag.StringVar(&userEmails, "user", "", "A comma separated list of regular user emails")
-    flag.StringVar(&adminEmails, "admin", "", "A comma separated list of admin user emails")
-    flag.StringVar(&sessionSecret, "session-secret", "change-me", "The session secret encryption hash")
-    flag.StringVar(&publicAddr, "public-addr", "", "The external hostname to use for OAuth callbacks")
-    flag.StringVar(&listen, "listen", ":8080", "The address for HTTP server to listen on")
+    flag.StringVar(&userEmails, "user", os.Getenv("USER_EMAIL"), "A comma separated list of regular user emails")
+    flag.StringVar(&adminEmails, "admin", os.Getenv("ADMIN_EMAIL"), "A comma separated list of admin user emails")
+    flag.StringVar(&sessionSecret, "session-secret", os.Getenv("SESSION_SECRET"), "The session secret encryption hash")
+    flag.StringVar(&publicAddr, "public-addr", os.Getenv("PUBLIC_ADDR"), "The external hostname to use for OAuth callbacks")
+    flag.StringVar(&listen, "listen", os.Getenv("LISTEN"), "The address for HTTP server to listen on")
     flag.StringVar(&gAuthSecret, "gauth-secret", os.Getenv("GPLUS_SECRET"), "The Google OAuth secret")
     flag.StringVar(&gAuthKey, "gauth-key", os.Getenv("GPLUS_KEY"), "The Google OAuth key")
-    flag.StringVar(&dbName, "database", "./test.db", "The SQLite3 database file to use")
+    flag.StringVar(&dbName, "database", os.Getenv("SQLITE_DB_FILE"), "The SQLite3 database file to use")
     flag.Parse()
+
+    // Generate a psuedo-random session secret for testing.
+    if sessionSecret == "" {
+        sessionSecret = func() string {
+            b := make([]byte, 32)
+            for i := range b {
+                b[i] = letterBytes[rand.Int63() % int64(len(letterBytes))]
+            }
+            return string(b)
+        }()
+    }
+
+    if listen == "" {
+        listen = ":8080"
+    }
 
     var wg sync.WaitGroup
 
