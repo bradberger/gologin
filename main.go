@@ -50,7 +50,7 @@ func init() {
     flag.StringVar(&adminEmails, "admin", os.Getenv("ADMIN_EMAIL"), "A comma separated list of admin user emails")
     flag.StringVar(&sessionSecret, "session-secret", os.Getenv("SESSION_SECRET"), "The session secret encryption hash")
     flag.StringVar(&publicAddr, "public-addr", os.Getenv("PUBLIC_ADDR"), "The external hostname to use for OAuth callbacks")
-    flag.StringVar(&listen, "listen", os.Getenv("LISTEN"), "The address for HTTP server to listen on")
+    flag.StringVar(&listen, "listen", os.Getenv("PORT"), "The address for HTTP server to listen on")
     flag.StringVar(&gAuthSecret, "gauth-secret", os.Getenv("GPLUS_SECRET"), "The Google OAuth secret")
     flag.StringVar(&gAuthKey, "gauth-key", os.Getenv("GPLUS_KEY"), "The Google OAuth key")
     flag.StringVar(&dbName, "database", os.Getenv("SQLITE_DB_FILE"), "The SQLite3 database file to use")
